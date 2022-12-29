@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jfgdeveloper.instagramclone.di.application.InstagramClone
+import com.jfgdeveloper.instagramclone.main.NotificationMessage
 import com.jfgdeveloper.instagramclone.ui.IgViewModel
 import com.jfgdeveloper.instagramclone.ui.SigUpScreen
 import com.jfgdeveloper.instagramclone.ui.theme.InstagramCloneTheme
@@ -48,10 +49,13 @@ fun InstagramApp() {
     val vm = hiltViewModel<IgViewModel>()
     val controller = rememberNavController()
 
+    // mostramos el toast
+    NotificationMessage(vm = vm)
+
     NavHost(navController = controller, startDestination = Screens.SigUp.route){
 
         composable(Screens.SigUp.route){
-            SigUpScreen(controller = controller, viewModel = vm)
+            SigUpScreen(controller = controller, vm = vm)
         }
     }
 
