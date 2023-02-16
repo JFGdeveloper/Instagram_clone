@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.storage.FirebaseStorage
@@ -19,13 +20,14 @@ const val USERS = "users"
 class IgViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
 ): ViewModel() {
 
     var signedIn by mutableStateOf(false)
     var inProgress by mutableStateOf(false)
     var userData by mutableStateOf<UserData?>(null)
     var popupNotification by mutableStateOf<Event<String>?>(null) // la uso para el event
+
 
 
     // SIEMPRE VOY A TENER EN EL USERDATA EL USER GRACIAS AL getUserData()
@@ -36,6 +38,8 @@ class IgViewModel @Inject constructor(
         currentUser?.uid?.let {
             getUserData(it)
         }
+
+
 
     }
 
@@ -62,11 +66,13 @@ class IgViewModel @Inject constructor(
                 }else{
                     auth.createUserWithEmailAndPassword(email,pass).addOnCompleteListener{ task ->
                         if (task.isSuccessful){
-                          signedIn = true
+                            signedIn = true
                             createOrUpdateProfile(userName = userName) // ACTUALIZO O CREO EL USER
                             handledException(custommessage = "Ok")
                         }else{
-                            handledException(task.exception,"SignUp Failed")
+                            // ME COMPRUEBA SI EL LOGIN EXISTE
+                            handledException(task.exception,"SignUp Failed por un email no valido")
+
                         }
                         inProgress = false
 
@@ -94,11 +100,11 @@ class IgViewModel @Inject constructor(
                 signedIn = true
                 inProgress = false
             }else{
-                handledException(task.exception,"Login failed")
+                handledException(task.exception,"Login failed en el usercurrent")
                 inProgress= false
             }
         }.addOnFailureListener {
-            handledException(it,"Login failed")
+            handledException(it,"Login failed con email y pass")
             inProgress = false
         }
     }
@@ -109,7 +115,7 @@ class IgViewModel @Inject constructor(
         bio: String? = null,
         imgUrl: String? = null
     ) {
-        // creo el objeto
+        // creo el objeto y el ID
         val userId = auth.currentUser?.uid
         val user = UserData(
                 userId = userId,
@@ -120,6 +126,7 @@ class IgViewModel @Inject constructor(
                 following = userData?.following
         )
 
+        // COMPRUEBO EL ID
         userId?.let { uid->
             inProgress = true
 
@@ -161,6 +168,8 @@ class IgViewModel @Inject constructor(
             inProgress = false
         }
     }
+
+
 
 
     // creamos un funcion para mostrar excepciones

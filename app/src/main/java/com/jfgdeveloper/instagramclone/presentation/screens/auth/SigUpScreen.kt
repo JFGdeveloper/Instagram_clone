@@ -1,5 +1,6 @@
 package com.jfgdeveloper.instagramclone.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -38,6 +40,7 @@ fun SigUpScreen(controller: NavController, vm: IgViewModel) {
     var emailState by remember { mutableStateOf("")}
     var passState by remember { mutableStateOf("")}
     val focus = LocalFocusManager.current
+
 
     Box(modifier = Modifier.fillMaxSize()){
         Column(modifier = Modifier
@@ -79,11 +82,8 @@ fun SigUpScreen(controller: NavController, vm: IgViewModel) {
             
             Button(onClick = {
                 focus.clearFocus(true)
-                             vm.onSingUp(
-                                 userNameState,
-                                 emailState,
-                                 passState
-                             )
+                 vm.onSingUp(userNameState,emailState,passState)
+
             }, modifier = Modifier.padding(8.dp)) {
                 Text(text = "SignUp")
             }

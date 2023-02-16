@@ -42,6 +42,8 @@ fun BottomNavigationMenu(controller: NavController, itemSelected: BottomNavigati
                     colorFilter = if (itemSelected == item) ColorFilter.tint(Color.Black)
                     else ColorFilter.tint(Color.Gray)
             )
+
+
         }
 
     }
