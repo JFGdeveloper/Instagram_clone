@@ -2,10 +2,11 @@ package com.jfgdeveloper.instagramclone.main
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -13,8 +14,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.ImagePainter
+import coil.compose.rememberImagePainter
+import com.jfgdeveloper.instagramclone.R
 import com.jfgdeveloper.instagramclone.Screens
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 
@@ -66,4 +74,45 @@ fun CheckSignedIn(controller: NavController,vm: IgViewModel){
 
         }
     }
+}
+
+
+// para poder usarlo en varias necesidades
+@Composable
+fun CommonImage(
+    data:String?,
+    modifier: Modifier = Modifier.wrapContentSize(),
+    contentScale: ContentScale = ContentScale.Crop
+){
+    val painter = rememberImagePainter(data = data )
+    Image(painter = painter, contentDescription = null, contentScale = contentScale, modifier = modifier)
+    if (painter.state is ImagePainter.State.Loading){
+        CircularProgressIndicator()
+    }
+
+}
+
+@Composable
+fun UserImageCard(
+    userImg: String?,
+    modifier: Modifier = Modifier
+        .padding(8.dp)
+        .size(64.dp)
+) {
+
+    Card(modifier = modifier, shape = CircleShape) {
+
+        if (userImg.isNullOrEmpty()){
+            Image(
+                    painter = painterResource(id = R.drawable.ic_person),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.Gray)
+            )
+        }else{
+            CommonImage(data = userImg)
+        }
+
+    }
+
+
 }
