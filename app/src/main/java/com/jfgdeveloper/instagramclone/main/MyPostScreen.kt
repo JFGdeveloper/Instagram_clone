@@ -1,5 +1,6 @@
 package com.jfgdeveloper.instagramclone.main
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 
 @Composable
 fun MyPostScreen(controller: NavController,vm: IgViewModel) {
+    Log.d("javi","oncreate MypostScreen")
     val userData = vm.userData
     val isLoading = vm.inProgress
 

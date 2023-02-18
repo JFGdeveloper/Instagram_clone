@@ -1,5 +1,6 @@
 package com.jfgdeveloper.instagramclone.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 
 @Composable
 fun SigUpScreen(controller: NavController, vm: IgViewModel) {
+    Log.d("javi","oncreate SigupScreen")
 
     // navega a la pantalla directa como ejm home
     CheckSignedIn(controller = controller, vm = vm)

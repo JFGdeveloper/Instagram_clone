@@ -1,5 +1,6 @@
 package com.jfgdeveloper.instagramclone.presentation.screens.auth
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import com.jfgdeveloper.instagramclone.main.navigateTo
 
 @Composable
 fun ProfileScreen(controller: NavController,vm: IgViewModel) {
+    Log.d("javi","oncreate ProfileScreen")
     val isLoading = vm.inProgress
     if (isLoading){
         MyProgressBar()
@@ -43,7 +45,7 @@ fun ProfileScreen(controller: NavController,vm: IgViewModel) {
                 onUsernameChange = { username.value = it},
                 onBioChange = { bio.value = it},
                 onBack = { navigateTo(controller,Screens.MyPost) },
-                onSave = {},
+                onSave = {vm.updateProfileUser(name = name.value, userName = username.value,bio= bio.value)},
                 onLogout = {}
 
         )

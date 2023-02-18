@@ -1,5 +1,6 @@
 package com.jfgdeveloper.instagramclone.main
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
@@ -10,6 +11,7 @@ import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 
 @Composable
 fun SearchScreen(controller: NavController,vm: IgViewModel) {
+    Log.d("javi","oncreate SearchScreen")
     Column(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = "SEARCH SCREEN")

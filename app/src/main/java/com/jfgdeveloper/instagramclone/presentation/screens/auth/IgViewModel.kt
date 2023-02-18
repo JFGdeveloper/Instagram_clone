@@ -1,5 +1,6 @@
 package com.jfgdeveloper.instagramclone.presentation.screens.auth
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -32,6 +33,7 @@ class IgViewModel @Inject constructor(
 
     // SIEMPRE VOY A TENER EN EL USERDATA EL USER GRACIAS AL getUserData()
     init {
+        Log.d("javi","init igViewModel")
         //auth.signOut()
         val currentUser = auth.currentUser
         signedIn = currentUser != null
@@ -178,5 +180,10 @@ class IgViewModel @Inject constructor(
         val error = exception?.localizedMessage ?: ""
         val message = if (custommessage.isEmpty()) error else "$custommessage: $error"
         popupNotification = Event(message)
+    }
+
+
+    fun updateProfileUser(name: String,userName: String,bio: String){
+        createOrUpdateProfile(name,userName,bio)
     }
 }

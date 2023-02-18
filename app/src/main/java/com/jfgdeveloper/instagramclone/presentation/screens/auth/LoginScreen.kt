@@ -1,5 +1,6 @@
 package com.jfgdeveloper.instagramclone.presentation.screens.auth
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,6 +29,7 @@ import com.jfgdeveloper.instagramclone.main.navigateTo
 
 @Composable
 fun LoginScreen(controller: NavHostController, vm: IgViewModel) {
+    Log.d("javi","oncreate LoginScreen")
 
     // navega directo a la pantalla por ejem home
     CheckSignedIn(controller = controller, vm = vm)
