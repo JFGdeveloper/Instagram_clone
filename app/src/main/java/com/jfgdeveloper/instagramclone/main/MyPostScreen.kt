@@ -7,10 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jfgdeveloper.instagramclone.R
+import com.jfgdeveloper.instagramclone.Screens
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 
 @Composable
@@ -67,7 +65,7 @@ fun MyPostScreen(controller: NavController,vm: IgViewModel) {
 
         
         OutlinedButton(
-                onClick = {},
+                onClick = { navigateTo(controller,Screens.Profile) },
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
@@ -82,13 +80,19 @@ fun MyPostScreen(controller: NavController,vm: IgViewModel) {
         }
         BottomNavigationMenu(controller = controller, itemSelected = BottomNavigationItem.POST)
     }
+
+    if (isLoading) CircularProgressIndicator()
 }
 
 @Composable
 fun ProfileImage(img: String?, onClick: ()-> Unit) {
 
-    Box(modifier = Modifier.padding(16.dp).clickable { onClick() }){
-        UserImageCard(userImg = img, modifier = Modifier.padding(3.dp).size(80.dp))
+    Box(modifier = Modifier
+        .padding(16.dp)
+        .clickable { onClick() }){
+        UserImageCard(userImg = img, modifier = Modifier
+            .padding(3.dp)
+            .size(80.dp))
 
         Card(
                 modifier = Modifier
@@ -106,6 +110,8 @@ fun ProfileImage(img: String?, onClick: ()-> Unit) {
                     colorFilter = ColorFilter.tint(Color.Black)
             )
         }
+
+
 
 
     }

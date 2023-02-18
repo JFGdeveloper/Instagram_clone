@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -69,7 +71,7 @@ fun CheckSignedIn(controller: NavController,vm: IgViewModel){
 
     if (signed && !alreadyLoggedIn){
         alreadyLoggedIn = true
-        controller.navigate(Screens.Feed.route){
+        controller.navigate(Screens.MyPost.route){
             popUpTo(0)
 
         }
@@ -114,5 +116,18 @@ fun UserImageCard(
 
     }
 
+
+}
+
+@Composable
+fun MyProgress() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun CustomDivider(modifier: Modifier = Modifier) {
+    Divider(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp).alpha(0.3f), thickness = 1.dp, color = Color.Gray)
 
 }

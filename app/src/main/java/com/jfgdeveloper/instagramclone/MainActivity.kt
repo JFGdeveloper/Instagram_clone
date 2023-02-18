@@ -20,6 +20,7 @@ import com.jfgdeveloper.instagramclone.main.NotificationMessage
 import com.jfgdeveloper.instagramclone.main.SearchScreen
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.LoginScreen
+import com.jfgdeveloper.instagramclone.presentation.screens.auth.ProfileScreen
 import com.jfgdeveloper.instagramclone.ui.SigUpScreen
 import com.jfgdeveloper.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +49,7 @@ sealed class Screens (val route: String){
     object Feed: Screens("feed")
     object MyPost: Screens("myPost")
     object Search: Screens("search")
+    object Profile: Screens("profile")
 }
 
 @Composable
@@ -78,6 +80,10 @@ fun InstagramApp() {
 
         composable(Screens.Search.route){
             SearchScreen(controller = controller, vm = vm)
+        }
+
+        composable(Screens.Profile.route){
+            ProfileScreen(controller = controller, vm = vm)
         }
 
 
