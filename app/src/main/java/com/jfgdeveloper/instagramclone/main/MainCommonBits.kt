@@ -121,7 +121,7 @@ fun UserImageCard(
 
 @Composable
 fun MyProgress() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxSize().background(Color.Transparent), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
 }

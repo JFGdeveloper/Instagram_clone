@@ -1,15 +1,15 @@
 package com.jfgdeveloper.instagramclone.presentation.screens.auth
 
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jfgdeveloper.instagramclone.Screens
+import com.jfgdeveloper.instagramclone.main.CommonImage
 import com.jfgdeveloper.instagramclone.main.CustomDivider
 import com.jfgdeveloper.instagramclone.main.MyProgressBar
 import com.jfgdeveloper.instagramclone.main.navigateTo
@@ -46,7 +47,10 @@ fun ProfileScreen(controller: NavController,vm: IgViewModel) {
                 onBioChange = { bio.value = it},
                 onBack = { navigateTo(controller,Screens.MyPost) },
                 onSave = {vm.updateProfileUser(name = name.value, userName = username.value,bio= bio.value)},
-                onLogout = {}
+                onLogout = {
+                    vm.onLogOut()
+                    navigateTo(controller,Screens.Login)
+                }
 
         )
         
@@ -69,6 +73,7 @@ fun ProfileContent(
     onLogout: ()-> Unit
 ) {
     val rememberScroll = rememberScrollState()
+    val imgUrl = vm.userData?.imageUrl
     
     Column(modifier = Modifier
         .verticalScroll(rememberScroll)
@@ -86,12 +91,8 @@ fun ProfileContent(
 
         CustomDivider()
 
-        Column(modifier = Modifier
-            .height(200.dp)
-            .fillMaxWidth()
-            .background(Color.Gray)) {
+        ProfileImage(imageUrl = imgUrl, vm = vm)
 
-        }
 
         CustomDivider()
 
@@ -144,4 +145,37 @@ fun ProfileContent(
         }
     }
     
+}
+
+@Composable
+fun ProfileImage(imageUrl: String?, vm: IgViewModel){
+
+    val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+            onResult = {it ->
+                it?.let {
+                    vm.uploadProfileImage(uri = it)
+                }
+
+            }
+    )
+
+    Box(modifier = Modifier.height(IntrinsicSize.Min)){
+        Column(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .clickable {launcher.launch("image/*") },
+                horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Card(modifier = Modifier.size(100.dp), shape = CircleShape) {
+                CommonImage(data = imageUrl)
+            }
+            Text(text = "Change image picture")
+
+        }
+        val isLoading = vm.inProgress
+        if (isLoading) MyProgressBar()
+    }
 }

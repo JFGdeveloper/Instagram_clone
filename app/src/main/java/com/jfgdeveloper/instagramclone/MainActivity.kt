@@ -14,10 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.jfgdeveloper.instagramclone.main.FeedScreen
-import com.jfgdeveloper.instagramclone.main.MyPostScreen
-import com.jfgdeveloper.instagramclone.main.NotificationMessage
-import com.jfgdeveloper.instagramclone.main.SearchScreen
+import com.jfgdeveloper.instagramclone.main.*
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.LoginScreen
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.ProfileScreen
@@ -50,6 +47,9 @@ sealed class Screens (val route: String){
     object MyPost: Screens("myPost")
     object Search: Screens("search")
     object Profile: Screens("profile")
+    object NewPost: Screens("newPost/{imageUri}"){
+        fun crateRout(uri:String)= "newPost/$uri"
+    }
 }
 
 @Composable
@@ -84,6 +84,13 @@ fun InstagramApp() {
 
         composable(Screens.Profile.route){
             ProfileScreen(controller = controller, vm = vm)
+        }
+
+        composable(Screens.NewPost.route){ navBackStackEntry ->
+            val imageUri = navBackStackEntry.arguments?.getString("imageUri")
+            imageUri?.let {
+                NewPostScreen(viewModel = vm, navController = controller, encodeUrl = it)
+            }
         }
 
 

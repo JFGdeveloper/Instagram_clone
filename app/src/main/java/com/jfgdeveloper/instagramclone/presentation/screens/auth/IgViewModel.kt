@@ -1,21 +1,26 @@
 package com.jfgdeveloper.instagramclone.presentation.screens.auth
 
+import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.storage.FirebaseStorage
 import com.jfgdeveloper.instagramclone.data.Event
+import com.jfgdeveloper.instagramclone.data.PostData
 import com.jfgdeveloper.instagramclone.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.UUID
 import javax.inject.Inject
 
 const val USERS = "users"
+const val POST = "post"
 
 @HiltViewModel
 class IgViewModel @Inject constructor(
@@ -28,6 +33,10 @@ class IgViewModel @Inject constructor(
     var inProgress by mutableStateOf(false)
     var userData by mutableStateOf<UserData?>(null)
     var popupNotification by mutableStateOf<Event<String>?>(null) // la uso para el event
+
+    // Lo creamos especifico para la pantalla del pos
+    var refreshPostProgress by mutableStateOf(false)
+    var posts = mutableStateOf<List<PostData>>(listOf())
 
 
 
@@ -165,6 +174,7 @@ class IgViewModel @Inject constructor(
             val user = it.toObject<UserData>()
             userData = user
             inProgress = false
+            refreshPost()
         }.addOnFailureListener{
             handledException(it,"Cannot retrieve user")
             inProgress = false
@@ -185,5 +195,112 @@ class IgViewModel @Inject constructor(
 
     fun updateProfileUser(name: String,userName: String,bio: String){
         createOrUpdateProfile(name,userName,bio)
+    }
+
+
+
+    private fun uploadImage(uri: Uri, onSuccess: (Uri)->Unit){
+        inProgress = true
+
+        val storageRef = storage.reference
+        val uuid= UUID.randomUUID()
+        val imageRef = storageRef.child("images/$uuid")
+        val uploadTask = imageRef.putFile(uri) // esto la sube a firebase creo
+
+        uploadTask.addOnSuccessListener {
+            val resul = it.metadata?.reference?.downloadUrl
+            resul?.addOnSuccessListener(onSuccess)
+        }.addOnFailureListener{
+            handledException(it)
+            inProgress = false
+        }
+
+    }
+
+    fun uploadProfileImage(uri:Uri){
+        uploadImage(uri){
+            createOrUpdateProfile(imgUrl = it.toString())
+        }
+    }
+
+
+    fun onLogOut(){
+        auth.signOut()
+        signedIn = false
+        userData = null
+        popupNotification = Event("Logout")
+    }
+
+    // onPostSuccess lo usare para navegar a otra pantalla
+    fun onNewPost(uri: Uri,description: String,onPostSuccess: ()->Unit){
+        uploadImage(uri = uri){
+            onCreatePost(uri,description,onPostSuccess)
+        }
+    }
+
+
+    private fun onCreatePost(uri: Uri,description: String,onPostSuccess: () -> Unit){
+        inProgress = true
+        val currentUi = auth.currentUser?.uid
+        val currentUsername = userData?.username
+        val currentImage = userData?.imageUrl
+
+        if (currentUi != null){
+            val randomUI = UUID.randomUUID()
+            val post = PostData(
+                    postId = randomUI.toString(),
+                    userId = currentUi,
+                    username = currentUsername,
+                    userImage = currentImage,
+                    postImage = uri.toString(),
+                    postDescription = description,
+                    time = System.currentTimeMillis()
+                    )
+
+            db.collection(POST).document(randomUI.toString()).set(post).addOnSuccessListener {
+                popupNotification = Event("nuevo post: success")
+                inProgress = false
+                refreshPost()
+                onPostSuccess()
+            }.addOnFailureListener{
+                handledException(custommessage = "Error: ${it.message}")
+                inProgress = false
+            }
+
+        }else{
+            handledException(custommessage = "Error: unavailable user data")
+            onLogOut()
+            inProgress = false
+        }
+    }// oncreate post
+
+    private fun refreshPost(){
+        val currentUi = auth.currentUser?.uid
+        if (currentUi != null){
+            refreshPostProgress = true
+            // saco todos los post con el id del usuario y lo paso a mi lista de arriba
+            db.collection(POST).whereEqualTo("userId",currentUi).get().addOnSuccessListener {
+                covertPost(it,posts) // lo convierte a java
+                refreshPostProgress = false
+            }.addOnFailureListener {
+                handledException(custommessage = "ERROR: ${it.message}")
+                refreshPostProgress = false
+            }
+
+
+        }else{
+            handledException(custommessage = "ERROR: unavailable user ")
+            onLogOut()
+        }
+    }
+
+    private fun covertPost(document: QuerySnapshot,myPost: MutableState<List<PostData>>) {
+        val newPost = mutableListOf<PostData>()
+        document.forEach { document ->
+            val post = document.toObject<PostData>()
+            newPost.add(post)
+        }
+        val sortedPost = newPost.sortedByDescending { it.time }
+        myPost.value = sortedPost
     }
 }

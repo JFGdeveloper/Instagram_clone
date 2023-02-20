@@ -1,6 +1,9 @@
 package com.jfgdeveloper.instagramclone.main
 
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +28,16 @@ import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 
 @Composable
 fun MyPostScreen(controller: NavController,vm: IgViewModel) {
+
+    val laucher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+            onResult = {
+                val encode= Uri.encode(it.toString())
+                val route = Screens.NewPost.crateRout(encode)
+                controller.navigate(route)
+            }
+    )
+
     Log.d("javi","oncreate MypostScreen")
     val userData = vm.userData
     val isLoading = vm.inProgress
@@ -32,7 +45,9 @@ fun MyPostScreen(controller: NavController,vm: IgViewModel) {
     Column() {
         Column() {
             Row() {
-                ProfileImage(img = userData?.imageUrl) {}
+                ProfileImage(img = userData?.imageUrl) {
+                    laucher.launch("image/*")
+                }
                 Text(
                         text = "15\nPost",
                         modifier = Modifier
@@ -83,7 +98,7 @@ fun MyPostScreen(controller: NavController,vm: IgViewModel) {
         BottomNavigationMenu(controller = controller, itemSelected = BottomNavigationItem.POST)
     }
 
-    if (isLoading) CircularProgressIndicator()
+    if (isLoading) MyProgressBar()
 }
 
 @Composable
