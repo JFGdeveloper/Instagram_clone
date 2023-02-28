@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
@@ -220,7 +221,36 @@ class IgViewModel @Inject constructor(
     fun uploadProfileImage(uri:Uri){
         uploadImage(uri){
             createOrUpdateProfile(imgUrl = it.toString())
+            updatePostUserImageData(it.toString())
         }
+    }
+
+
+    // para la imagen del pos del user
+    private fun updatePostUserImageData(uri: String){
+        val currentId = auth.currentUser?.uid
+
+        db.collection(POST).whereEqualTo("userId", currentId).get().addOnSuccessListener {
+            val posts = mutableStateOf<List<PostData>>(arrayListOf())
+            covertPost(it,posts)
+            val refs = arrayListOf<DocumentReference>()
+            for (post in posts.value){
+                post.userId?.let { id ->
+                     refs.add(db.collection(POST).document(id))
+                }
+            }
+
+            if (refs.isNotEmpty()){
+                db.runBatch {batch ->
+                    for (ref in refs ){
+                        batch.update(ref,"userImage",uri)
+                    }
+                }.addOnSuccessListener {
+                    refreshPost()
+                }
+            }
+        }
+
     }
 
 
@@ -254,14 +284,15 @@ class IgViewModel @Inject constructor(
                     userImage = currentImage,
                     postImage = uri.toString(),
                     postDescription = description,
-                    time = System.currentTimeMillis()
+                    time = System.currentTimeMillis(),
+                    like = listOf<String>()
                     )
 
             db.collection(POST).document(randomUI.toString()).set(post).addOnSuccessListener {
                 popupNotification = Event("nuevo post: success")
                 inProgress = false
                 refreshPost()
-                onPostSuccess()
+                onPostSuccess.invoke()
             }.addOnFailureListener{
                 handledException(custommessage = "Error: ${it.message}")
                 inProgress = false
@@ -294,9 +325,9 @@ class IgViewModel @Inject constructor(
         }
     }
 
-    private fun covertPost(document: QuerySnapshot,myPost: MutableState<List<PostData>>) {
+    private fun covertPost(documents: QuerySnapshot, myPost: MutableState<List<PostData>>) {
         val newPost = mutableListOf<PostData>()
-        document.forEach { document ->
+        documents.forEach { document ->
             val post = document.toObject<PostData>()
             newPost.add(post)
         }

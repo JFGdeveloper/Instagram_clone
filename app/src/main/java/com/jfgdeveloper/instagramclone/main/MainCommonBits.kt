@@ -1,5 +1,6 @@
 package com.jfgdeveloper.instagramclone.main
 
+import android.os.Parcelable
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -56,7 +57,13 @@ fun MyProgressBar() {
 }
 
 
-fun navigateTo(navController: NavController,screens: Screens) {
+// creado para pasar parametro objeto parcelable
+data class NavParam(val name: String, val value: Parcelable)
+
+fun navigateTo(navController: NavController,screens: Screens,vararg navParams: NavParam) {
+    for (param in navParams){
+        navController.currentBackStackEntry?.arguments?.putParcelable(param.name,param.value)
+    }
     navController.navigate(screens.route){
         popUpTo(screens.route)
         launchSingleTop= true

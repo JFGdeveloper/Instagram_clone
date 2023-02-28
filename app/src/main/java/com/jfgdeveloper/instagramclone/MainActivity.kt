@@ -14,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.jfgdeveloper.instagramclone.data.PostData
 import com.jfgdeveloper.instagramclone.main.*
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.IgViewModel
 import com.jfgdeveloper.instagramclone.presentation.screens.auth.LoginScreen
@@ -50,6 +51,7 @@ sealed class Screens (val route: String){
     object NewPost: Screens("newPost/{imageUri}"){
         fun crateRout(uri:String)= "newPost/$uri"
     }
+    object SinglePost: Screens("singlePost")
 }
 
 @Composable
@@ -90,6 +92,14 @@ fun InstagramApp() {
             val imageUri = navBackStackEntry.arguments?.getString("imageUri")
             imageUri?.let {
                 NewPostScreen(viewModel = vm, navController = controller, encodeUrl = it)
+            }
+        }
+
+        // en el Maincommon puedo ver como paso los parametros
+        composable(Screens.SinglePost.route){
+            val post = controller.previousBackStackEntry?.arguments?.getParcelable<PostData>("post")
+            post?.let {
+                SinglePostScreen(controller = controller, vm = vm, post = post)
             }
         }
 

@@ -121,7 +121,13 @@ fun MyPostScreen(controller: NavController,vm: IgViewModel) {
                 postLoading = postLoading,
                 posts = posts,
                 modifier = Modifier.weight(1f).padding(1.dp).fillMaxSize(),
-                onPostClick ={}
+                onPostClick ={post ->
+                    navigateTo(
+                            navController = controller,
+                            screens = Screens.SinglePost,
+                            NavParam("post",post)
+                    )
+                }
         )
 
         BottomNavigationMenu(controller = controller, itemSelected = BottomNavigationItem.POST)
@@ -185,6 +191,7 @@ fun PostList(
 
     }else{
         LazyColumn(modifier = modifier) {
+            // convertir nuestra list de post del viewModel en una postrow()
             val rows = arrayListOf<PostRow>()
             var currentRow = PostRow()
             rows.add(currentRow)
