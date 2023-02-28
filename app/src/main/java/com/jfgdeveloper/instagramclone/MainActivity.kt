@@ -23,6 +23,9 @@ import com.jfgdeveloper.instagramclone.ui.SigUpScreen
 import com.jfgdeveloper.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+
+
+// todo continua por el video 39
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
